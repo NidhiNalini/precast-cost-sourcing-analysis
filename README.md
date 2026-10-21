@@ -54,7 +54,16 @@ The workbook recalculates all of these if an input or assumption changes.
 yellow fill = key assumption. Dark-blue headers are raw columns; grey-blue headers are
 calculated columns.
 
-<!-- Screenshots: add images from docs/screenshots/ here (see docs/EXERCISES.md, Exercise 5) -->
+### Screenshots
+
+**Product cost roll-up:** unit cost, selling price, margin and data status for each product
+![Cost roll-up](docs/screenshots/cost_rollup.png)
+
+**Sourcing:** 2025 material spend by origin country and by supplier, with reconciliation checks
+![Sourcing analysis](docs/screenshots/sourcing.png)
+
+**Data quality:** automated checks with severity and suggested action
+![Data quality checks](docs/screenshots/data_quality.png)
 
 ---
 
@@ -117,6 +126,10 @@ python scripts/build_workbook.py    # creates workbook/Precast_Cost_Analysis.xls
 ```
 
 Open the workbook in Excel; formulas calculate when the file opens.
+
+> **Note:** the script creates the base workbook only. Later changes (layout adjustments, and the
+> Power Query and PivotTable work) were made directly in Excel, so running the script again
+> would overwrite them. The committed workbook is the current version.
 
 ## Power Query and PivotTables
 
