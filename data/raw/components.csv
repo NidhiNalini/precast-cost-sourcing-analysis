@@ -1,0 +1,20 @@
+comp_code,description,uom,unit_cost,currency,supplier_id,origin_country,hs_code
+CMT-GU,Portland cement Type GU,T,235.0,CAD,SUP-01,CA,2523.29
+SCM-FA,Fly ash Class F,T,72.0,USD,SUP-02,US,2621.90
+AGG-20,Coarse aggregate 20 mm,T,28.0,CAD,SUP-03,CA,2517.10
+AGG-SND,Concrete sand,T,24.0,CAD,SUP-03,CA,2505.90
+ADM-SP,Superplasticizer admixture,L,3.1,USD,SUP-04,US,3824.40
+ADM-AE,Air-entraining admixture,L,2.4,USD,SUP-04,US,382440
+RB-10M,Rebar 10M,KG,1.38,CAD,SUP-05,CA,7214.20
+RB-15M,Rebar 15M,KG,1.31,CAD,SUP-05,CA,7214.20
+RB-20M,Rebar 20M,KG,0.93,USD,SUP-06,TR,7214.20
+WWM-152,Welded wire mesh 152x152 MW25.8,M2,4.6,USD,SUP-07,US,7314.20
+STR-127,Prestressing strand 12.7 mm,KG,1.5,USD,SUP-08,KR,7312.10
+GSK-0600,Rubber pipe gasket 600 mm,EA,18.5,USD,SUP-09,MX,4016.93
+GSK-0900,Rubber pipe gasket 900 mm,EA,26.0,USD,SUP-09,MX,4016.93
+GSK-1200,Rubber pipe gasket 1200 mm,EA,34.0,USD,SUP-09,,4016.93
+LFT-ANC,Lifting anchor 2.5 t,EA,4.6,EUR,SUP-10,DE,7326.90
+CST-FRM,Catch basin frame and grate casting,EA,210.0,CAD,SUP-11,IN,7325.10
+SEAL-BUT,Butyl joint sealant,M,,CAD,SUP-12,CA,3214.10
+FRM-OIL,Form release agent,L,1.15,CAD,SUP-12,CA,2710.19
+rb-15m ,Rebar 15M (old price),KG,1.29,CAD,SUP-05,CA,7214.20

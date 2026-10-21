@@ -1,0 +1,13 @@
+item_no,description,category,uom,hs_code,list_price_cad,conversion_cost_cad
+PC-RCP-0600,Reinforced concrete pipe 600 mm x 2.44 m,Pipe,EA,6810.91,640,310
+PC-RCP-0900,Reinforced concrete pipe 900 mm x 2.44 m,Pipe,EA,6810.91,1150,540
+PC-RCP-1200,Reinforced concrete pipe 1200 mm x 2.44 m,Pipe,EA,6810.91,1890,860
+PC-BOX-1812,Box culvert section 1.8 m x 1.2 m x 1.8 m,Box Culvert,EA,6810.91,4200,1950
+PC-MH-1050B,Manhole base 1050 mm,Manhole,EA,6810.91,980,470
+PC-MH-1200B,Manhole base 1200 mm,Manhole,EA,6810.91,1240,600
+PC-MH-1200R,Manhole riser 1200 mm x 600 mm,Manhole,EA,6810.91,520,300
+PC-CB-0600,Catch basin 600 mm x 600 mm,Catch Basin,EA,6810.91,690,170
+PC-BAR-F38,F-shape traffic barrier 3.8 m,Barrier,EA,6810.99,1450,650
+PC-BAR-SS60,Single-slope traffic barrier 6.0 m,Barrier,EA,6810.99,2350,980
+PC-HC-200,Hollow-core slab 200 mm (per m2),Slab,M2,6810.91,118,52
+PC-HC-250,Hollow-core slab 250 mm (per m2),Slab,M2,,136,60

@@ -1,0 +1,12 @@
+supplier_id,supplier_name,country,currency,lead_time_days
+SUP-01,Prairie Cement Co.,CA,CAD,7
+SUP-02,Great Plains Ash Inc.,US,USD,14
+SUP-03,Red Valley Aggregates,CA,CAD,3
+SUP-04,Midwest Admix Solutions,US,USD,10
+SUP-05,Northern Rebar Mills,CA,CAD,10
+SUP-06,Anatolia Steel Trading,TR,USD,60
+SUP-07,Lakeside Wire Products,US,USD,14
+SUP-08,Hanbit Strand Co.,KR,USD,55
+SUP-09,Sierra Rubber Works,MX,USD,21
+SUP-10,Rhein Lifting Systems,DE,EUR,45
+SUP-12,Westway Site Supply,CA,CAD,5
