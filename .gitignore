@@ -17,3 +17,6 @@ desktop.ini
 # Local notes and secrets (never commit)
 .env
 notes_private/
+
+# VS Code Local History extension
+.history/
