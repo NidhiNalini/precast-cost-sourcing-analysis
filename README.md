@@ -71,7 +71,8 @@ calculated columns.
 
 1. **Standardise keys.** Codes are cleaned with `TRIM` and `UPPER` before matching, so
    `"rb-15m "` and `"RB-15M"` are treated as the same component.
-2. **Look up component data** (cost, unit, origin, supplier) for each BOM line with `INDEX/MATCH`.
+2. **Look up component data** (cost, unit, origin, supplier) for each BOM line with `XLOOKUP`,
+   using its *if not found* argument to flag missing codes instead of hiding errors.
 3. **Convert units** when the BOM unit differs from the purchase unit (for example LB to KG),
    using a conversion table on the Assumptions sheet.
 4. **Convert costs to CAD** using the exchange-rate table.
@@ -127,21 +128,31 @@ python scripts/build_workbook.py    # creates workbook/Precast_Cost_Analysis.xls
 
 Open the workbook in Excel; formulas calculate when the file opens.
 
-> **Note:** the script creates the base workbook only. Later changes (layout adjustments, and the
-> Power Query and PivotTable work) were made directly in Excel, so running the script again
-> would overwrite them. The committed workbook is the current version.
+The workbook uses `XLOOKUP`, which needs Excel 2021 or Microsoft 365. For older Excel versions
+or LibreOffice, build an `INDEX/MATCH` version instead:
 
-## Power Query and PivotTables
+```bash
+python scripts/build_workbook.py --compat
+```
 
-The `powerquery/` folder holds M code that repeats the cleaning steps with Power Query.
-`docs/EXERCISES.md` explains how to load the queries, build a PivotTable of monthly revenue
-by category, and convert lookups to `XLOOKUP`.
+> **Note:** running the build script replaces `workbook/Precast_Cost_Analysis.xlsx`. If you have
+> added your own sheets or queries in Excel, save a copy first.
+
+## Power Query
+
+The `powerquery/` folder holds M code that repeats the main cleaning steps with Power Query:
+loading the CSV files, setting data types, standardising codes, joining BOM lines to components
+(left join, so unmatched lines stay visible), converting units and currencies, and removing
+duplicate components.
+
+`docs/EXERCISES.md` explains how to load the queries into Excel and extend the analysis
+with a PivotTable.
 
 ---
 
 ## Skills demonstrated
 
-- Excel: `INDEX/MATCH`, `SUMIFS`, `COUNTIFS`, `SUMPRODUCT`, named ranges, conditional formatting
+- Excel: `XLOOKUP`, `SUMIFS`, `COUNTIFS`, `SUMPRODUCT`, named ranges, conditional formatting
 - Power Query (M): type conversion, merges (joins), grouping, de-duplication
 - Bill of materials costing, margin and cost-to-price analysis
 - Supplier and country-of-origin analysis

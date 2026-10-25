@@ -4,17 +4,20 @@ build_workbook.py
 Builds workbook/Precast_Cost_Analysis.xlsx from the CSV files in data/raw/.
 
 Every calculated cell is a live Excel formula, so the workbook recalculates
-when an input changes. Lookups use INDEX/MATCH so the file works in any Excel
-version (and in LibreOffice). Converting them to XLOOKUP is one of the
-exercises in docs/EXERCISES.md.
+when an input changes. Lookups are written with XLOOKUP (Excel 2021 or
+Microsoft 365). Use --compat to write INDEX/MATCH instead, for older Excel
+versions or LibreOffice.
 
 Usage:
-    python scripts/build_workbook.py
+    python scripts/build_workbook.py            # XLOOKUP version
+    python scripts/build_workbook.py --compat   # INDEX/MATCH version
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
+import re
 from datetime import date
 from pathlib import Path
 
@@ -76,7 +79,8 @@ def header(ws, row: int, cols: list[tuple[str, int, bool]]) -> None:
         c.alignment = Alignment(wrap_text=True, vertical="center")
         c.border = BOX
         ws.column_dimensions[get_column_letter(i)].width = width
-    ws.row_dimensions[row].height = 30
+    longest = max(len(t) for t, _, _ in cols)
+    ws.row_dimensions[row].height = 45 if longest > 18 else 30
 
 
 def put(ws, row, col, value, font=F_BASE, fmt=None):
@@ -111,7 +115,22 @@ def rng(sheet: str, col: str) -> str:
 
 
 # ======================================================================
-def build() -> None:
+# INDEX(return_range, MATCH(key, lookup_range, 0))  ->  XLOOKUP(key, lookup_range, return_range)
+_INDEX_MATCH = re.compile(r"INDEX\(([^,()]+),MATCH\(([^,()]+),([^,()]+),0\)\)")
+# IFERROR(XLOOKUP(k, l, r), "text")  ->  XLOOKUP(k, l, r, "text")  (if_not_found argument)
+_IFERROR_XL = re.compile(r'IFERROR\(_xlfn\.XLOOKUP\(([^,()]+),([^,()]+),([^,()]+)\),("[^"]*")\)')
+
+
+def to_xlookup(formula: str) -> str:
+    """Rewrite INDEX/MATCH lookups as XLOOKUP. Other formulas are returned unchanged.
+
+    The _xlfn. prefix is how Excel stores functions added after Excel 2007; Excel hides it.
+    """
+    out = _INDEX_MATCH.sub(r"_xlfn.XLOOKUP(\2,\3,\1)", formula)
+    return _IFERROR_XL.sub(r"_xlfn.XLOOKUP(\1,\2,\3,\4)", out)
+
+
+def build(compat: bool = False) -> None:
     items = read_csv("items.csv")
     suppliers = read_csv("suppliers.csv")
     comps = read_csv("components.csv")
@@ -376,7 +395,7 @@ def build() -> None:
     ws = ws_so
     title(ws, "Sourcing Analysis (2025)",
           "Material spend = BOM extended cost x units sold in 2025. Shows where purchased material comes from.")
-    header(ws, 4, [("Origin country", 14, True), ("Material spend 2025 (CAD)", 16, True),
+    header(ws, 4, [("Origin country", 26, True), ("Material spend 2025 (CAD)", 16, True),
                    ("Share of spend", 11, True), ("BOM lines", 10, True), ("", 4, True),
                    ("Supplier", 11, True), ("Supplier name", 26, True), ("Country", 9, True),
                    ("Lead time (days)", 10, True), ("Material spend 2025 (CAD)", 16, True),
@@ -434,7 +453,7 @@ def build() -> None:
           "Built with SUMIFS. A PivotTable version is one of the exercises in docs/EXERCISES.md.")
     ws.column_dimensions["A"].width = 30
     for col in "BCDEFG":
-        ws.column_dimensions[col].width = 15
+        ws.column_dimensions[col].width = 18
     kpis = [
         ("Revenue, all priced lines (CAD)", f'=SUM({rng("Sales","L")})', FMT_CUR0),
         ("Revenue with known cost (CAD)", f'=SUMIFS({rng("Sales","L")},{rng("Sales","J")},"<>UNKNOWN")', FMT_CUR0),
@@ -456,6 +475,7 @@ def build() -> None:
     header_cols = ["Category", "Units", "Revenue (CAD)", "Cost of sales (CAD)", "Gross margin (CAD)", "GM %"]
     for i, h in enumerate(header_cols, start=1):
         c = ws.cell(row=r0, column=i, value=h); c.font = F_HEAD; c.fill = FILL_CALC; c.border = BOX
+        c.alignment = Alignment(wrap_text=True, vertical="center")
     cats = ["Pipe", "Box Culvert", "Manhole", "Catch Basin", "Barrier", "Slab"]
     for i, cat in enumerate(cats):
         r = r0 + 1 + i
@@ -477,6 +497,7 @@ def build() -> None:
     ws.cell(row=r1 - 1, column=1, value="By ship-to country").font = F_BOLD
     for i, h in enumerate(["Country", "Units", "Revenue (CAD)", "Share of revenue"], start=1):
         c = ws.cell(row=r1, column=i, value=h); c.font = F_HEAD; c.fill = FILL_CALC; c.border = BOX
+        c.alignment = Alignment(wrap_text=True, vertical="center")
     for i, cc in enumerate(["CA", "US"]):
         r = r1 + 1 + i
         put(ws, r, 1, cc, F_INPUT)
@@ -642,6 +663,10 @@ def build() -> None:
         if v == "Grey-blue header":
             ws.cell(row=r, column=1).fill = FILL_CALC; ws.cell(row=r, column=1).font = F_HEAD
 
+    # Analysis sheets read like reports: no gridlines
+    for w in (ws_about, ws_as, ws_cr, ws_so, ws_sm, ws_dq, ws_oq):
+        w.sheet_view.showGridLines = False
+
     # Tab colours: inputs dark, analysis lighter
     for w in (ws_it, ws_su, ws_co, ws_bo, ws_sa):
         w.sheet_properties.tabColor = "1F3A5F"
@@ -658,6 +683,13 @@ def build() -> None:
         w.page_setup.fitToHeight = 0
         w.sheet_properties.pageSetUpPr.fitToPage = True
 
+    if not compat:
+        for w in wb.worksheets:
+            for row in w.iter_rows():
+                for c in row:
+                    if isinstance(c.value, str) and c.value.startswith("="):
+                        c.value = to_xlookup(c.value)
+
     wb.calculation.fullCalcOnLoad = True
     OUT.parent.mkdir(parents=True, exist_ok=True)
     wb.save(OUT)
@@ -665,4 +697,6 @@ def build() -> None:
 
 
 if __name__ == "__main__":
-    build()
+    parser = argparse.ArgumentParser(description="Build workbook/Precast_Cost_Analysis.xlsx from data/raw/.")
+    parser.add_argument("--compat", action="store_true", help="use INDEX/MATCH instead of XLOOKUP")
+    build(compat=parser.parse_args().compat)
